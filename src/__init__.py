@@ -17,3 +17,25 @@ Modules:
 
 __version__ = "0.1.0"
 
+# Data loading exports
+from .data_loading import (
+    load_expression_matrix,
+    load_patient_mapping,
+    build_anndata,
+    load_melanoma_data,
+    DEFAULT_EXPR_PATH,
+    DEFAULT_PATIENT_PATH,
+)
+
+# Preprocessing exports
+from .preprocessing import (
+    filter_genes,
+    filter_cells,
+    compute_qc_metrics,
+    normalize_expression,
+    add_response_labels,
+    run_preprocessing_pipeline,
+    save_preprocessed_data,
+    load_preprocessed_data,
+    DEFAULT_OUTPUT_PATH,
+)
