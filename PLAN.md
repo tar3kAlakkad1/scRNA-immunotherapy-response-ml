@@ -139,8 +139,8 @@ pip install -r requirements.txt
 
 ### Acceptance Criteria (Environment)
 
-- [ ] `python -c "import scanpy, xgboost, sklearn; print('OK')"` runs without error
-- [ ] Jupyter notebook kernel uses the correct environment
+- [x] `python -c "import scanpy, xgboost, sklearn; print('OK')"` runs without error
+- [x] Jupyter notebook kernel uses the correct environment
 
 ---
 
@@ -156,9 +156,9 @@ pip install -r requirements.txt
 3. Verify files can be decompressed
 
 **Acceptance Criteria:**
-- [ ] `data/raw/GSE120575_Sade_Feldman_melanoma_single_cells_TPM_GEO.txt.gz` exists
-- [ ] `data/raw/GSE120575_patient_ID_single_cells.txt.gz` exists
-- [ ] `zcat data/raw/*.gz | head` shows valid TSV content
+- [x] `data/raw/GSE120575_Sade_Feldman_melanoma_single_cells_TPM_GEO.txt.gz` exists
+- [x] `data/raw/GSE120575_patient_ID_single_cells.txt.gz` exists
+- [x] `zcat data/raw/*.gz | head` shows valid TSV content
 
 ---
 
@@ -181,9 +181,9 @@ pip install -r requirements.txt
 - `adata.var` = gene-level metadata (gene names as index)
 
 **Acceptance Criteria:**
-- [ ] `adata.shape` is approximately (16000, 17000) – ~16k cells, ~17k genes
-- [ ] `adata.obs['patient_id']` has ~48 unique values
-- [ ] No NaN values in expression matrix (or handled appropriately)
+- [x] `adata.shape` is approximately (16000, 17000) – ~16k cells, ~17k genes
+- [x] `adata.obs['patient_id']` has ~48 unique values
+- [x] No NaN values in expression matrix (or handled appropriately)
 
 ---
 
@@ -205,9 +205,9 @@ pip install -r requirements.txt
 **Output:** Save processed AnnData to `data/processed/melanoma_adata.h5ad`
 
 **Acceptance Criteria:**
-- [ ] Gene count reduced from ~17k to ~8k–12k after filtering
-- [ ] Expression values are log-transformed (check `adata.X.max()` is reasonable, e.g., <20)
-- [ ] File saved and can be reloaded: `adata = sc.read_h5ad('data/processed/melanoma_adata.h5ad')`
+- [x] Gene count reduced from ~17k to ~8k–12k after filtering
+- [x] Expression values are log-transformed (check `adata.X.max()` is reasonable, e.g., <20)
+- [x] File saved and can be reloaded: `adata = sc.read_h5ad('data/processed/melanoma_adata.h5ad')`
 
 ---
 
@@ -267,9 +267,9 @@ If labels cannot be parsed automatically, create a manual mapping based on the p
 - `adata.obs['response_binary']` = 1 (R) or 0 (NR) for XGBoost
 
 **Acceptance Criteria:**
-- [ ] All 48 patients have a response label
-- [ ] ~17 responders, ~31 non-responders (or close to paper's split)
-- [ ] Every cell has a non-null `response` value
+- [x] All 48 patients have a response label
+- [x] ~17 responders, ~31 non-responders (or close to paper's split)
+- [x] Every cell has a non-null `response` value
 
 ---
 
@@ -286,6 +286,15 @@ If labels cannot be parsed automatically, create a manual mapping based on the p
 - ~17 patients labeled 'R' (responder)
 - ~31 patients labeled 'NR' (non-responder)
 - Cell counts may be imbalanced (some patients have more cells)
+
+**Acceptance Criteria:**
+- [x] Patient-level distribution verified: 17 Responders (35.4%), 31 Non-responders (64.6%)
+- [x] Cell-level distribution computed: 5,564 Responder cells (34.2%), 10,726 Non-responder cells (65.8%)
+- [x] Class imbalance visualized in `results/figures/label_distribution_verification.png`
+- [x] Therapy distribution analyzed in `results/figures/label_therapy_distribution.png`
+- [x] All validation checks passed (via `labels.validate_labels()`)
+
+**Notebook:** `notebooks/03_label_verification.ipynb`
 
 ---
 
