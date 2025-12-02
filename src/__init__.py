@@ -52,3 +52,26 @@ from .labels import (
     RESPONSE_FULL_TO_BINARY,
     RESPONSE_BINARY_TO_FULL,
 )
+
+# Model exports (Task 3.1)
+from .model import (
+    train_xgboost,
+    predict_cells,
+    aggregate_to_patient,
+    leave_one_patient_out_cv,
+    get_patient_true_labels,
+    compute_feature_importances,
+    evaluate_signature_genes,
+    DEFAULT_XGBOOST_PARAMS,
+    PRECISE_11_GENE_SIGNATURE,
+)
+
+# Evaluation exports (Task 3.2)
+from .evaluation import (
+    compute_roc_auc,
+    plot_roc_curve,
+    plot_patient_predictions,
+    generate_results_table,
+    generate_patient_results_table,
+    evaluate_model_results,
+)

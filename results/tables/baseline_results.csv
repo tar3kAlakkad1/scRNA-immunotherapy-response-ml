@@ -1,0 +1,16 @@
+Metric,Value
+Model,Baseline XGBoost
+ROC AUC,0.7704
+Number of Patients,48
+  - Responders,17
+  - Non-responders,31
+Number of Cells,"16,290"
+Number of Genes,"12,785"
+Runtime (seconds),1450.3
+Runtime (minutes),24.2
+Score Range (min),0.0343
+Score Range (max),0.6748
+Score Mean (all),0.3290
+Score Std (all),0.1669
+Score Mean (Responders),0.4268
+Score Mean (Non-responders),0.2754
