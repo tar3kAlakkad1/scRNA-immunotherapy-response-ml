@@ -563,7 +563,7 @@ if __name__ == "__main__":
     import sys
 
     # Import sibling modules
-    from preprocessing import load_preprocessed_data, DEFAULT_OUTPUT_PATH
+    from src.preprocessing import load_preprocessed_data, DEFAULT_OUTPUT_PATH
 
     project_root = Path(__file__).parent.parent
 
