@@ -75,3 +75,16 @@ from .evaluation import (
     generate_patient_results_table,
     evaluate_model_results,
 )
+
+# Feature selection exports (Task 4.1)
+from .feature_selection import (
+    run_boruta_selection,
+    importance_based_selection,
+    get_feature_importance_df,
+    compute_importances_from_loocv,
+    run_loocv_with_selected_genes,
+    run_nested_loocv_with_selection,  # Correct approach - no data leakage
+    save_selected_genes,
+    plot_feature_importance,
+    run_feature_selection_pipeline,
+)
