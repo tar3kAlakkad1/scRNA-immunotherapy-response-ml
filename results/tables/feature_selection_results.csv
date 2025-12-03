@@ -1,0 +1,16 @@
+Metric,Value
+Model,Feature Selection (Top 50)
+ROC AUC,0.7723
+Number of Patients,48
+  - Responders,17
+  - Non-responders,31
+Number of Cells,"16,290"
+Number of Genes,"12,785"
+Runtime (seconds),1498.4
+Runtime (minutes),25.0
+Score Range (min),0.0246
+Score Range (max),0.6239
+Score Mean (all),0.3175
+Score Std (all),0.1493
+Score Mean (Responders),0.4091
+Score Mean (Non-responders),0.2672
