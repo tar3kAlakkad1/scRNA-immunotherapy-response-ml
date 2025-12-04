@@ -1,0 +1,4 @@
+Model,Our AUC,Paper AUC,N Genes,Notes
+Baseline XGBoost (All Genes),0.770,0.84,12785,All genes after QC
+Feature Selected (Nested CV),0.772,0.89,50,Top genes by importance (nested CV - no leakage)
+11-Gene Signature,0.909,~0.85*,11,"GAPDH, CD38, CCR7, HLA-DRB5, STAT1, GZMH, LGALS1, IFI6, EPSTI1, HLA-G, GBP5"

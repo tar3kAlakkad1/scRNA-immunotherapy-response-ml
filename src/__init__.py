@@ -88,3 +88,15 @@ from .feature_selection import (
     plot_feature_importance,
     run_feature_selection_pipeline,
 )
+
+# Signature analysis exports (Task 5)
+from .signature_analysis import (
+    check_signature_genes_presence,
+    get_signature_gene_ranks,
+    plot_signature_gene_expression,
+    plot_signature_importance_comparison,
+    plot_model_comparison,
+    plot_combined_roc_curves,
+    run_signature_analysis,
+    generate_final_comparison_table,
+)
