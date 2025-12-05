@@ -50,6 +50,6 @@ Flags:
 - `--skip-preprocessing` use cached `data/processed/melanoma_adata.h5ad` if present.
 - `--quick` skip nested feature selection (faster, but less conservative).
 
-Notes:
+## Notes:
 - Full run can take on the order of tens of minutes depending on hardware; `--quick` is suitable for fast iteration.
 - Outputs land in `results/figures/` and `results/tables/`; check the console summary for AUCs and file paths.
