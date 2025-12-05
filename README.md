@@ -1,5 +1,4 @@
 # scRNA-immunotherapy-response-ml
-Reproducing the PRECISE framework from a research paper of interest to me. 
 
 ## Setup
 ```bash
@@ -8,63 +7,55 @@ conda activate csc427-project
 pip install pysam scanpy anndata pandas numpy xgboost scikit-learn matplotlib seaborn boruta tqdm shap jupyter
 ```
 
-## Task 3.1 - Baseline XGModel trained output
+## Overview
+Reproduction of the PRECISE framework (Pinhasi & Yizhak, 2025) to predict immune checkpoint inhibitor (ICI) response from single-cell RNA-seq of melanoma-infiltrating immune cells. The pipeline runs end-to-end: data loading, preprocessing, label attachment, LOO-CV modeling, feature selection, 11-gene signature analysis, and figure/table generation.
 
-$ cd /Users/tarekalakkadp/Desktop/uvic/fourth-year/fall/csc427/final-project/scRNA-immunotherapy-response-ml && pip install xgboost scikit-learn && python src/model.py
-Loading preprocessed data...
-------------------------------------------------------------
-Loaded preprocessed data from: /Users/tarekalakkadp/Desktop/uvic/fourth-year/fall/csc427/final-project/scRNA-immunotherapy-response-ml/data/processed/melanoma_adata.h5ad
-Shape: 16,290 cells x 12,785 genes
+## Paper at a Glance (Original Research Summary)
+- PRECISE uses XGBoost on per-cell expression, aggregates to patient scores via leave-one-patient-out CV, and reports AUC ~0.84 on melanoma.
+- Boruta feature selection boosts performance to ~0.89.
+- Derives an 11-gene signature (GAPDH, CD38, CCR7, HLA-DRB5, STAT1, GZMH, LGALS1, IFI6, EPSTI1, HLA-G, GBP5) that generalizes across multiple cancer cohorts; RL-based cell filtration further improves AUCs (>0.94 on melanoma).
 
+## Data & Labels
+- Primary dataset: GSE120575 (Sade-Feldman melanoma immune cells), 16,290 cells x 12,785 genes post-QC, 48 patients (17 responders, 31 non-responders).
+- Inputs stored in `data/raw/` (TPM expression + cell→patient mapping); processed AnnData cached at `data/processed/melanoma_adata.h5ad`.
+- Labels are patient-level response mapped onto all cells; validated distribution matches the paper.
 
-============================================================
-LEAVE-ONE-PATIENT-OUT CROSS-VALIDATION
-============================================================
+## Implemented Pipeline
+- Preprocessing: filter genes expressed in <3% of cells; drop cells with <200 genes; remove mitochondrial genes; keep log-transformed values; store AnnData.
+- Modeling: XGBoost classifier with leave-one-patient-out CV; patient score = mean per-cell probability.
+- Feature selection: importance-based gene ranking; nested LOO-CV using top 50 genes to avoid leakage (quick mode uses a non-nested shortcut).
+- Signature analysis: verify 11-gene presence, rank them, and train an 11-gene-only model; generate comparison plots/tables.
+- Stretch experiments: simple confidence-based cell filtration and a small external BCC cohort test.
 
-Dataset: 16,290 cells x 12,785 genes
-Patients: 48
-XGBoost params: defaults
+## Results
 
-Running LOO-CV...
-  Completed fold 10/48
-  Completed fold 20/48
-  Completed fold 30/48
-  Completed fold 40/48
+| Model / Setting | Our AUC | Paper AUC | Notes |
+| --- | --- | --- | --- |
+| Baseline XGBoost (all genes) | 0.770 | 0.84 | LOO-CV, full gene set after QC |
+| Feature-selected (nested, top 50 genes) | 0.772 | 0.89 | Nested LOO to prevent leakage (quick/non-nested run ~0.913 is optimistic) |
+| 11-gene signature (melanoma) | 0.909 | ~0.85 | 10/11 signature genes rank in our top 50 |
+| 11-gene signature (BCC external) | 0.40 | ~0.68→0.70 after RL filtration | Limited transfer without RL-style filtration |
 
-  Completed all 48 folds in 1485.3 seconds
+Figures and tables are under `results/figures/` and `results/tables/` (e.g., `final_comparison.csv`, ROC curves, importance plots, signature ranks).
 
-============================================================
-RESULTS
-============================================================
+## How to Run
 
-Patient-level ROC AUC: 0.770
-Score range: [0.034, 0.675]
-Label distribution: 17 responders, 31 non-responders
+Environment:
+```bash
+conda create -n csc427-project python=3.11 -y
+conda activate csc427-project
+pip install -r requirements.txt
+```
 
-============================================================
-ACCEPTANCE CRITERIA CHECK
-============================================================
+Full pipeline (from repo root):
+```bash
+python run_pipeline.py
+```
 
-1. LOO-CV completed for all patients:
-   Patients processed: 48
-   Expected: 48
-   Status: PASS
+Flags:
+- `--skip-preprocessing` use cached `data/processed/melanoma_adata.h5ad` if present.
+- `--quick` skip nested feature selection (faster, but less conservative).
 
-2. Runtime is reasonable:
-   Runtime: 1485.3 seconds (24.8 minutes)
-   Expected: <15 minutes (900 seconds)
-   Status: FAIL
-
-3. Patient-level scores in valid range:
-   Score range: [0.034, 0.675]
-   Expected: [0.0, 1.0]
-   Status: PASS
-
-4. Model performance (informational):
-   ROC AUC: 0.770
-   Paper reports: ~0.84 for base model
-   Difference: 0.070
-
-============================================================
-OVERALL: SOME CHECKS FAILED
-============================================================
+Notes:
+- Full run can take on the order of tens of minutes depending on hardware; `--quick` is suitable for fast iteration.
+- Outputs land in `results/figures/` and `results/tables/`; check the console summary for AUCs and file paths.
