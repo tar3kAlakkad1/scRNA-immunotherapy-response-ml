@@ -100,3 +100,23 @@ from .signature_analysis import (
     run_signature_analysis,
     generate_final_comparison_table,
 )
+
+# Stretch goals exports (Phase 7)
+from .stretch_goals import (
+    # Goal A: Cell Filtration
+    compute_cell_predictivity_scores,
+    run_cell_filtration_experiment,
+    plot_cell_filtration_results,
+    # Goal B: External Validation
+    BCC_PATIENT_RESPONSES,
+    load_bcc_data,
+    compute_signature_score,
+    run_external_validation,
+    plot_external_validation,
+    # Goal C: SHAP
+    compute_shap_values,
+    plot_shap_analysis,
+    plot_shap_beeswarm,
+    # Main runner
+    run_all_stretch_goals,
+)
