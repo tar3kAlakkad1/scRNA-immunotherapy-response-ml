@@ -247,7 +247,9 @@ def plot_patient_predictions(
         patch_artist=True,
         showfliers=False,
     )
-    for patch, color in zip(bp["boxes"], [colors["Non-responder"], colors["Responder"]]):
+    for patch, color in zip(
+        bp["boxes"], [colors["Non-responder"], colors["Responder"]]
+    ):
         patch.set_facecolor(color)
         patch.set_alpha(0.3)
 
@@ -445,7 +447,7 @@ def generate_patient_results_table(
         Per-patient results DataFrame sorted by predicted score.
     """
     patients = list(patient_scores.keys())
-    
+
     df = pd.DataFrame(
         {
             "Patient_ID": patients,
@@ -460,8 +462,7 @@ def generate_patient_results_table(
                 for p in patients
             ],
             "Correct": [
-                (patient_scores[p] >= 0.5) == (patient_labels[p] == 1)
-                for p in patients
+                (patient_scores[p] >= 0.5) == (patient_labels[p] == 1) for p in patients
             ],
         }
     )
@@ -673,4 +674,3 @@ if __name__ == "__main__":
     print("=" * 60)
 
     sys.exit(0 if all_pass else 1)
-

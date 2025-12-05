@@ -1,12 +1,5 @@
 # scRNA-immunotherapy-response-ml
 
-## Setup
-```bash
-conda create -n csc427-project python=3.11 -y
-conda activate csc427-project
-pip install pysam scanpy anndata pandas numpy xgboost scikit-learn matplotlib seaborn boruta tqdm shap jupyter
-```
-
 ## Overview
 Reproduction of the PRECISE framework (Pinhasi & Yizhak, 2025) to predict immune checkpoint inhibitor (ICI) response from single-cell RNA-seq of melanoma-infiltrating immune cells. The pipeline runs end-to-end: data loading, preprocessing, label attachment, LOO-CV modeling, feature selection, 11-gene signature analysis, and figure/table generation.
 
@@ -38,16 +31,17 @@ Reproduction of the PRECISE framework (Pinhasi & Yizhak, 2025) to predict immune
 
 Figures and tables are under `results/figures/` and `results/tables/` (e.g., `final_comparison.csv`, ROC curves, importance plots, signature ranks).
 
-## How to Run
+## How to run
+Before getting started, make sure you follow the setup steps below. 
 
-Environment:
+### Setup
 ```bash
 conda create -n csc427-project python=3.11 -y
 conda activate csc427-project
 pip install -r requirements.txt
 ```
 
-Full pipeline (from repo root):
+### Running the full pipeline (from repo root):
 ```bash
 python run_pipeline.py
 ```

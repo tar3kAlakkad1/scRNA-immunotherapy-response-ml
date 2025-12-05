@@ -30,6 +30,7 @@ import xgboost as xgb
 # Try to import BorutaPy; provide fallback message if not available
 try:
     from boruta import BorutaPy
+
     BORUTA_AVAILABLE = True
 except ImportError:
     BORUTA_AVAILABLE = False
@@ -111,14 +112,11 @@ def run_boruta_selection(
     """
     if not BORUTA_AVAILABLE:
         raise ImportError(
-            "Boruta package is not installed. "
-            "Install it with: pip install boruta"
+            "Boruta package is not installed. " "Install it with: pip install boruta"
         )
 
     if X.shape[0] != len(y):
-        raise ValueError(
-            f"X has {X.shape[0]} samples but y has {len(y)} labels"
-        )
+        raise ValueError(f"X has {X.shape[0]} samples but y has {len(y)} labels")
 
     start_time = time.time()
 
@@ -240,7 +238,7 @@ def importance_based_selection(
     --------
     >>> # From a trained model
     >>> indices, genes = importance_based_selection(model, gene_names, top_n=500)
-    
+
     >>> # From pre-computed importances
     >>> indices, genes = importance_based_selection(
     ...     None, gene_names, importance_df=importance_df
@@ -252,17 +250,19 @@ def importance_based_selection(
     elif model is not None:
         # Extract importances from model
         importances = model.get_booster().get_score(importance_type=importance_type)
-        
+
         # Convert to array
         importance_array = np.zeros(len(gene_names))
         for fname, score in importances.items():
             feature_idx = int(fname[1:])  # Remove 'f' prefix
             importance_array[feature_idx] = score
-        
-        df = pd.DataFrame({
-            "gene": gene_names,
-            "importance": importance_array,
-        })
+
+        df = pd.DataFrame(
+            {
+                "gene": gene_names,
+                "importance": importance_array,
+            }
+        )
     else:
         raise ValueError("Either model or importance_df must be provided")
 
@@ -274,14 +274,14 @@ def importance_based_selection(
 
     # Sort by importance and select top N
     df = df.sort_values("importance", ascending=False).reset_index(drop=True)
-    
+
     # Limit to top_n
     top_n = min(top_n, len(df))
     df_top = df.head(top_n)
-    
+
     # Get selected genes and their indices
     selected_genes = df_top["gene"].tolist()
-    
+
     # Map back to original indices
     gene_to_idx = {g: i for i, g in enumerate(gene_names)}
     selected_indices = [gene_to_idx[g] for g in selected_genes]
@@ -340,7 +340,7 @@ def get_feature_importance_df(
 
     for fold_idx, model in enumerate(models):
         importances = model.get_booster().get_score(importance_type=importance_type)
-        
+
         for fname, score in importances.items():
             feature_idx = int(fname[1:])  # Remove 'f' prefix
             all_importances[fold_idx, feature_idx] = score
@@ -350,13 +350,15 @@ def get_feature_importance_df(
     std_importance = all_importances.std(axis=0)
 
     # Create DataFrame
-    df = pd.DataFrame({
-        "gene": gene_names,
-        "importance": mean_importance,
-        "mean_importance": mean_importance,  # Alias for clarity
-        "importance_std": std_importance,
-        "std_importance": std_importance,  # Alias for clarity
-    })
+    df = pd.DataFrame(
+        {
+            "gene": gene_names,
+            "importance": mean_importance,
+            "mean_importance": mean_importance,  # Alias for clarity
+            "importance_std": std_importance,
+            "std_importance": std_importance,  # Alias for clarity
+        }
+    )
 
     # Sort by importance and add rank
     df = df.sort_values("importance", ascending=False).reset_index(drop=True)
@@ -453,9 +455,13 @@ def run_loocv_with_selected_genes(
     genes_missing = [g for g in selected_genes if g not in adata.var_names]
 
     if verbose:
-        print(f"\nSelected genes found in data: {len(genes_found)}/{len(selected_genes)}")
+        print(
+            f"\nSelected genes found in data: {len(genes_found)}/{len(selected_genes)}"
+        )
         if genes_missing:
-            print(f"Missing genes: {genes_missing[:10]}{'...' if len(genes_missing) > 10 else ''}")
+            print(
+                f"Missing genes: {genes_missing[:10]}{'...' if len(genes_missing) > 10 else ''}"
+            )
 
     if not genes_found:
         raise ValueError("No selected genes found in the dataset")
@@ -631,10 +637,20 @@ def run_nested_loocv_with_selection(
     runtime = time.time() - start_time
 
     # Sort gene selection counts
-    gene_selection_overlap = pd.DataFrame([
-        {"gene": gene, "times_selected": count, "selection_rate": count / n_patients}
-        for gene, count in gene_selection_counts.items()
-    ]).sort_values("times_selected", ascending=False).reset_index(drop=True)
+    gene_selection_overlap = (
+        pd.DataFrame(
+            [
+                {
+                    "gene": gene,
+                    "times_selected": count,
+                    "selection_rate": count / n_patients,
+                }
+                for gene, count in gene_selection_counts.items()
+            ]
+        )
+        .sort_values("times_selected", ascending=False)
+        .reset_index(drop=True)
+    )
 
     if verbose:
         print(f"\n  Completed all {n_patients} folds in {runtime:.1f} seconds")
@@ -644,12 +660,18 @@ def run_nested_loocv_with_selection(
         print(f"\nPatient-level ROC AUC: {auc:.4f}")
         print(f"Score range: [{min(y_scores):.3f}, {max(y_scores):.3f}]")
         print(f"\nGene selection consistency:")
-        print(f"  Genes selected in ALL folds: {len(gene_selection_overlap[gene_selection_overlap['times_selected'] == n_patients])}")
-        print(f"  Genes selected in >50% folds: {len(gene_selection_overlap[gene_selection_overlap['selection_rate'] > 0.5])}")
+        print(
+            f"  Genes selected in ALL folds: {len(gene_selection_overlap[gene_selection_overlap['times_selected'] == n_patients])}"
+        )
+        print(
+            f"  Genes selected in >50% folds: {len(gene_selection_overlap[gene_selection_overlap['selection_rate'] > 0.5])}"
+        )
         if len(gene_selection_overlap) > 0:
             print(f"\n  Top 10 most consistently selected genes:")
             for _, row in gene_selection_overlap.head(10).iterrows():
-                print(f"    {row['gene']}: {row['times_selected']}/{n_patients} folds ({row['selection_rate']:.0%})")
+                print(
+                    f"    {row['gene']}: {row['times_selected']}/{n_patients} folds ({row['selection_rate']:.0%})"
+                )
 
     return {
         "patient_scores": patient_scores,
@@ -700,10 +722,12 @@ def save_selected_genes(
         df = df.sort_values("importance", ascending=False).reset_index(drop=True)
         df["rank_in_selection"] = range(1, len(df) + 1)
     else:
-        df = pd.DataFrame({
-            "gene": selected_genes,
-            "rank_in_selection": range(1, len(selected_genes) + 1),
-        })
+        df = pd.DataFrame(
+            {
+                "gene": selected_genes,
+                "rank_in_selection": range(1, len(selected_genes) + 1),
+            }
+        )
 
     df.to_csv(save_path, index=False)
     print(f"Selected genes saved to: {save_path}")
@@ -752,7 +776,9 @@ def plot_feature_importance(
     # Determine colors
     if highlight_genes is not None:
         colors = [
-            "#f97316" if gene in highlight_genes else "#3b82f6"  # Orange for highlight, blue otherwise
+            (
+                "#f97316" if gene in highlight_genes else "#3b82f6"
+            )  # Orange for highlight, blue otherwise
             for gene in df_top["gene"]
         ]
     else:
@@ -789,6 +815,7 @@ def plot_feature_importance(
     # Add legend if highlighting
     if highlight_genes is not None:
         from matplotlib.patches import Patch
+
         legend_elements = [
             Patch(facecolor="#f97316", label="Signature Genes"),
             Patch(facecolor="#3b82f6", label="Other Genes"),
@@ -861,7 +888,7 @@ def run_feature_selection_pipeline(
             - gene_selection_overlap: How consistently genes are selected
     """
     output_dir = Path(output_dir)
-    
+
     if verbose:
         print("=" * 60)
         print("FEATURE SELECTION PIPELINE")
@@ -912,9 +939,10 @@ def run_feature_selection_pipeline(
         if hasattr(X, "toarray"):
             X = X.toarray()
         y = adata.obs["response_binary"].values
-        
+
         selected_indices, selected_genes, selection_info = run_boruta_selection(
-            X, y,
+            X,
+            y,
             gene_names=adata.var_names.tolist(),
             verbose=verbose,
         )
@@ -976,6 +1004,7 @@ def run_feature_selection_pipeline(
 
     # Plot feature importance
     from .model import PRECISE_11_GENE_SIGNATURE
+
     plot_feature_importance(
         importance_df,
         top_n=30,
@@ -1091,7 +1120,9 @@ if __name__ == "__main__":
     print(f"\n4. AUC comparison (nested CV - no data leakage):")
     print(f"   Baseline AUC (all genes):     {results['baseline_auc']:.4f}")
     print(f"   Nested CV AUC (top 50/fold):  {results['nested_auc']:.4f}")
-    print(f"   AUC change:                   {results['nested_auc'] - results['baseline_auc']:+.4f}")
+    print(
+        f"   AUC change:                   {results['nested_auc'] - results['baseline_auc']:+.4f}"
+    )
     print(f"   Paper baseline:               0.84")
     print(f"   Paper with Boruta:            0.89")
 
@@ -1110,4 +1141,3 @@ if __name__ == "__main__":
     print("=" * 60)
 
     sys.exit(0 if all_pass else 1)
-

@@ -81,11 +81,13 @@ def check_signature_genes_presence(
     presence_data = []
     for gene in signature_genes:
         is_present = gene in adata.var_names
-        presence_data.append({
-            "gene": gene,
-            "present": is_present,
-            "status": "Found" if is_present else "Missing",
-        })
+        presence_data.append(
+            {
+                "gene": gene,
+                "present": is_present,
+                "status": "Found" if is_present else "Missing",
+            }
+        )
 
     presence_df = pd.DataFrame(presence_data)
 
@@ -158,13 +160,17 @@ def get_signature_gene_ranks(
     sig_df = importance_df[importance_df["gene"].isin(signature_genes)].copy()
 
     # Mark genes not found
-    missing_genes = [g for g in signature_genes if g not in importance_df["gene"].values]
+    missing_genes = [
+        g for g in signature_genes if g not in importance_df["gene"].values
+    ]
     if missing_genes:
-        missing_df = pd.DataFrame({
-            "gene": missing_genes,
-            "importance": [np.nan] * len(missing_genes),
-            "rank": [np.nan] * len(missing_genes),
-        })
+        missing_df = pd.DataFrame(
+            {
+                "gene": missing_genes,
+                "importance": [np.nan] * len(missing_genes),
+                "rank": [np.nan] * len(missing_genes),
+            }
+        )
         sig_df = pd.concat([sig_df, missing_df], ignore_index=True)
 
     # Add convenience columns
@@ -177,20 +183,28 @@ def get_signature_gene_ranks(
 
     # Add position in signature for display
     gene_order = {g: i for i, g in enumerate(signature_genes)}
-    sig_df["signature_position"] = sig_df["gene"].map(lambda x: gene_order.get(x, -1) + 1)
+    sig_df["signature_position"] = sig_df["gene"].map(
+        lambda x: gene_order.get(x, -1) + 1
+    )
 
     if verbose:
         print("=" * 60)
         print("SIGNATURE GENE RANKINGS")
         print("=" * 60)
-        print(f"\n{'Gene':<12} {'Rank':>8} {'Importance':>12} {'Top 50':>8} {'Top 100':>9}")
+        print(
+            f"\n{'Gene':<12} {'Rank':>8} {'Importance':>12} {'Top 50':>8} {'Top 100':>9}"
+        )
         print("-" * 50)
         for _, row in sig_df.iterrows():
             rank_str = f"{int(row['rank'])}" if not pd.isna(row["rank"]) else "N/A"
-            imp_str = f"{row['importance']:.2f}" if not pd.isna(row["importance"]) else "N/A"
+            imp_str = (
+                f"{row['importance']:.2f}" if not pd.isna(row["importance"]) else "N/A"
+            )
             top50_str = "Yes" if row["in_top_50"] else "No"
             top100_str = "Yes" if row["in_top_100"] else "No"
-            print(f"{row['gene']:<12} {rank_str:>8} {imp_str:>12} {top50_str:>8} {top100_str:>9}")
+            print(
+                f"{row['gene']:<12} {rank_str:>8} {imp_str:>12} {top50_str:>8} {top100_str:>9}"
+            )
 
         # Summary stats
         n_top_50 = sig_df["in_top_50"].sum()
@@ -278,36 +292,42 @@ def plot_signature_gene_expression(
         else:
             # Already in full format
             response_labels = list(response_raw)
-        
-        plot_df = pd.DataFrame({
-            "Expression": expression,
-            "Response": response_labels,
-        })
+
+        plot_df = pd.DataFrame(
+            {
+                "Expression": expression,
+                "Response": response_labels,
+            }
+        )
 
         # Separate data by response for manual violin plotting
         nr_data = plot_df[plot_df["Response"] == "Non-responder"]["Expression"].values
         r_data = plot_df[plot_df["Response"] == "Responder"]["Expression"].values
 
         # Create violin plot using matplotlib's violinplot for better compatibility
-        parts_nr = ax.violinplot([nr_data], positions=[0], showmeans=False, showmedians=True)
-        parts_r = ax.violinplot([r_data], positions=[1], showmeans=False, showmedians=True)
-        
+        parts_nr = ax.violinplot(
+            [nr_data], positions=[0], showmeans=False, showmedians=True
+        )
+        parts_r = ax.violinplot(
+            [r_data], positions=[1], showmeans=False, showmedians=True
+        )
+
         # Color the violins
-        for pc in parts_nr['bodies']:
-            pc.set_facecolor('#ef4444')
-            pc.set_edgecolor('black')
+        for pc in parts_nr["bodies"]:
+            pc.set_facecolor("#ef4444")
+            pc.set_edgecolor("black")
             pc.set_alpha(0.7)
-        for pc in parts_r['bodies']:
-            pc.set_facecolor('#22c55e')
-            pc.set_edgecolor('black')
+        for pc in parts_r["bodies"]:
+            pc.set_facecolor("#22c55e")
+            pc.set_edgecolor("black")
             pc.set_alpha(0.7)
-        
+
         # Style the other parts
-        for partname in ['cbars', 'cmins', 'cmaxes', 'cmedians']:
+        for partname in ["cbars", "cmins", "cmaxes", "cmedians"]:
             if partname in parts_nr:
-                parts_nr[partname].set_edgecolor('black')
+                parts_nr[partname].set_edgecolor("black")
             if partname in parts_r:
-                parts_r[partname].set_edgecolor('black')
+                parts_r[partname].set_edgecolor("black")
 
         ax.set_xticks([0, 1])
         ax.set_xticklabels(["Non-responder", "Responder"], rotation=45, ha="right")
@@ -374,7 +394,9 @@ def plot_signature_importance_comparison(
 
     # Determine colors
     colors = [
-        "#f97316" if gene in signature_genes else "#3b82f6"  # Orange for signature, blue otherwise
+        (
+            "#f97316" if gene in signature_genes else "#3b82f6"
+        )  # Orange for signature, blue otherwise
         for gene in df_top["gene"]
     ]
 
@@ -415,6 +437,7 @@ def plot_signature_importance_comparison(
 
     # Add legend
     from matplotlib.patches import Patch
+
     legend_elements = [
         Patch(facecolor="#f97316", label="11-Gene Signature"),
         Patch(facecolor="#3b82f6", label="Other Genes"),
@@ -426,7 +449,8 @@ def plot_signature_importance_comparison(
     if sig_in_top:
         # Add count annotation
         ax.text(
-            0.02, 0.98,
+            0.02,
+            0.98,
             f"Signature genes in top {top_n}: {len(sig_in_top)}/11",
             transform=ax.transAxes,
             fontsize=10,
@@ -579,10 +603,10 @@ def plot_combined_roc_curves(
 
     # Color palette for different models
     colors = {
-        "Baseline (All Genes)": "#3b82f6",      # Blue
-        "Feature Selected": "#22c55e",           # Green
-        "11-Gene Signature": "#f97316",          # Orange
-        "Nested CV": "#8b5cf6",                  # Purple
+        "Baseline (All Genes)": "#3b82f6",  # Blue
+        "Feature Selected": "#22c55e",  # Green
+        "11-Gene Signature": "#f97316",  # Orange
+        "Nested CV": "#8b5cf6",  # Purple
     }
 
     for model_name, results in results_dict.items():
@@ -912,4 +936,3 @@ if __name__ == "__main__":
     print("=" * 60)
 
     sys.exit(0 if all_pass else 1)
-
