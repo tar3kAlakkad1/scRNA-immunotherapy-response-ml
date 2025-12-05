@@ -695,8 +695,14 @@ Use `--skip-preprocessing --quick` for faster iteration (~5-10 min).
 **Alternative:** Train a logistic regression on cell features to predict whether a cell is "easy to classify" (high confidence) or not.
 
 **Acceptance Criteria:**
-- [ ] Cell filtration implemented
-- [ ] AUC comparison: with vs. without filtration
+- [x] Cell filtration implemented
+- [x] AUC comparison: with vs. without filtration
+
+**Results:**
+- Baseline AUC: 0.770
+- 10% filtered AUC: 0.769 (slight decrease)
+- 20% filtered AUC: 0.748
+- Finding: Cell filtration did not improve AUC on this dataset (unlike paper's results with full RL approach)
 
 ---
 
@@ -707,7 +713,7 @@ Use `--skip-preprocessing --quick` for faster iteration (~5-10 min).
 **Candidate Datasets (from paper):**
 - TNBC (triple-negative breast cancer)
 - NSCLC (non-small cell lung cancer)
-- BCC (basal cell carcinoma)
+- BCC (basal cell carcinoma) ← **Used**
 
 **Steps:**
 1. Download external dataset from GEO
@@ -717,8 +723,13 @@ Use `--skip-preprocessing --quick` for faster iteration (~5-10 min).
 5. Compute AUC if response labels available
 
 **Acceptance Criteria:**
-- [ ] External data loaded and processed
-- [ ] AUC computed and compared to paper's reported value
+- [x] External data loaded and processed (GSE123813 BCC dataset)
+- [x] AUC computed and compared to paper's reported value
+
+**Results:**
+- BCC dataset: 21,328 cells from 11 patients (6 R, 5 NR)
+- All 11 signature genes found in BCC data
+- AUC: 0.40 (signature does not generalize well to BCC; may work in opposite direction)
 
 ---
 
@@ -733,8 +744,13 @@ Use `--skip-preprocessing --quick` for faster iteration (~5-10 min).
 4. Compare to XGBoost's built-in importance
 
 **Acceptance Criteria:**
-- [ ] SHAP summary plot generated
-- [ ] Discussion of gene interactions (if visible)
+- [x] SHAP summary plot generated
+- [x] Discussion of gene interactions (if visible)
+
+**Results:**
+- Top SHAP genes: MTRNR2L1, HCG4P5, GAPDH (signature gene!)
+- 8/11 signature genes found in SHAP top 50
+- SHAP and XGBoost importance show moderate correlation
 
 ---
 
